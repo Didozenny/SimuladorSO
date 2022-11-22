@@ -17,16 +17,12 @@ mutex m;//mutex para manejar la runqueue
 mutex p;//mutex para impresiones
 condition_variable vacio;//variable de condicion para que las hebras G intenten crear nuevas hebras
 condition_variable no_vacio;//variable de condicion para evitar procesar nuevas hebras cuando no quedan hebras a procesar
-condition_variable active_vacio;//variable de condicion para evitar que se comience a procesar elementos en la lista de expirados antes de terminar de procesar la lista de procesos activos por completo
 
 void work(int idHebra, int periodo, int b){
 	while(true){
-		unique_lock<mutex> ul(m);
-		no_vacio.wait(ul, []{return (rq.rqSize()!=0) ? true : false; });
-		active_vacio.wait(ul, []{return (rq.getActiveSize()!=0 || !pCount) ? true : false; });
-		p.lock();
+		unique_lock<mutex> ul(m);//obtenemos mutex
+		no_vacio.wait(ul, []{return (rq.rqSize()!=0 && (rq.getActiveSize()!=0 || pCount == 0)) ? true : false; });//en caso de que este vacio espera
 		hebraT T = rq.pop();
-		p.unlock();
 		pCount++;
 		ul.unlock();
 
@@ -36,15 +32,17 @@ void work(int idHebra, int periodo, int b){
 		cout<<"Hebra id: "<<idHebra<<" Proceso id: "<<T.getId()<<" Tiempo de ejecucion: "<<tiempoProcesar<<" Tiempo restante: "<<T.tiempoRestante()<<endl;;
 		p.unlock();
 
+		bool inserted = false;
 		ul.lock();
 		pCount--;
 		if(T.tiempoRestante() > 0){
-			int priority = 9 - 9*T.tiempoRestante()/b;
+			inserted = true;
+			int priority = 9*T.tiempoRestante()/b;
 			rq.insertE(T,priority);
 		}
 		ul.unlock();
-		vacio.notify_one();
-		active_vacio.notify_all();
+		if(!inserted)vacio.notify_one();
+		else no_vacio.notify_all();
 	}
 }
 
@@ -54,7 +52,7 @@ void addT(int maxAdd,int a,int b){
 		vacio.wait(ul, []{return (!rq.rqSize() && !pCount) ? true : false; });
 		for (int i = 0; i < 1 + rand()%maxAdd; ++i){
 			hebraT T(id,a,b);
-			int priority = 9 - 9*T.tiempoRestante()/b;
+			int priority = 9*T.tiempoRestante()/b;
 			rq.insertA(T,priority);
 			id++;
 		}
@@ -82,7 +80,7 @@ int main(int argc, char *argv[]){
 		rq.insertA(T,priority);
 		id++;
 	}
-
+	//creamos arreglo de hebras M 
 	thread hebraE[M];
 	for (int i = 0; i < M; ++i)
 		hebraE[i] = thread(work,i, periodo, b);
