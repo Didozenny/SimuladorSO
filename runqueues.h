@@ -14,5 +14,6 @@ public:
 	void insertA(hebraT T, int priority);
 	hebraT pop();
 	int rqSize();
+	int getActiveSize();
 };
 #endif

@@ -45,3 +45,5 @@ void runQueues::swapQ(){
 }
 
 int runQueues::rqSize(){return (sizeActive+sizeExpired);}
+
+int runQueues::getActiveSize(){return sizeActive;}

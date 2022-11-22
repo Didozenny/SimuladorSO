@@ -15,14 +15,18 @@ int id = 0;
 int pCount = 0;
 mutex m;//mutex para manejar la runqueue
 mutex p;//mutex para impresiones
-condition_variable vacio;
-condition_variable no_vacio;
+condition_variable vacio;//variable de condicion para que las hebras G intenten crear nuevas hebras
+condition_variable no_vacio;//variable de condicion para evitar procesar nuevas hebras cuando no quedan hebras a procesar
+condition_variable active_vacio;//variable de condicion para evitar que se comience a procesar elementos en la lista de expirados antes de terminar de procesar la lista de procesos activos por completo
 
 void work(int idHebra, int periodo, int b){
 	while(true){
 		unique_lock<mutex> ul(m);
 		no_vacio.wait(ul, []{return (rq.rqSize()!=0) ? true : false; });
+		active_vacio.wait(ul, []{return (rq.getActiveSize()!=0 || !pCount) ? true : false; });
+		p.lock();
 		hebraT T = rq.pop();
+		p.unlock();
 		pCount++;
 		ul.unlock();
 
@@ -40,6 +44,7 @@ void work(int idHebra, int periodo, int b){
 		}
 		ul.unlock();
 		vacio.notify_one();
+		active_vacio.notify_all();
 	}
 }
 
