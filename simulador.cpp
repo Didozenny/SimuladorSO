@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
 	for (int i = 0; i < N; ++i)
 	{
 		hebraT T(id,a,b);
-		int priority = 9 - 9*T.tiempoRestante()/b;
+		int priority = 9*T.tiempoRestante()/b;
 		rq.insertA(T,priority);
 		id++;
 	}
