@@ -1,6 +1,8 @@
 #ifndef RUNQUEUES
 #define RUNQUEUES
 #include "hebraT.h"
+#include <mutex>
+#include <iostream>
 
 class runQueues{
 private:
@@ -12,7 +14,7 @@ public:
 	~runQueues();
 	void insertE(hebraT T, int priority);
 	void insertA(hebraT T, int priority);
-	hebraT pop();
+	hebraT pop(mutex &p);
 	int rqSize();
 	int getActiveSize();
 };

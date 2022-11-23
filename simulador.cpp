@@ -24,7 +24,7 @@ void work(int idHebra, int periodo, int b){
 	while(!finish){
 		unique_lock<mutex> ul(m);//obtenemos mutex
 		no_vacio.wait(ul, []{return (rq.rqSize()!=0 && (rq.getActiveSize()!=0 || pCount == 0)) ? true : false; });//en caso de que este vacio espera
-		hebraT T = rq.pop();
+		hebraT T = rq.pop(p);
 		pCount++;
 		ul.unlock();
 

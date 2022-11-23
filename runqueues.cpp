@@ -22,8 +22,13 @@ void runQueues::insertA(hebraT T, int priority){
 	sizeActive++;
 }
 
-hebraT runQueues::pop(){
-	if(sizeActive == 0)swapQ();
+hebraT runQueues::pop(mutex &p){
+	if(sizeActive == 0){
+		swapQ();
+		p.lock();
+		cout<<"SE REALIZA SWAP DE QUEUE ACTIVA A EXPIRADA"<<endl;
+		p.unlock();
+	}
 	int lowestPrior;
 	for (int i = 0; i < 10; ++i){
 		if(!active[i].size())continue;
