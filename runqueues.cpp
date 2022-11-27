@@ -1,5 +1,6 @@
 #include "hebraT.h"
 #include "runqueues.h"
+
 runQueues::runQueues(){
 	sizeActive = 0;
 	sizeExpired = 0;
@@ -29,14 +30,9 @@ hebraT runQueues::pop(mutex &p){
 		cout<<"SE REALIZA SWAP DE QUEUE ACTIVA A EXPIRADA"<<endl;
 		p.unlock();
 	}
-	int lowestPrior;
-	for (int i = 0; i < 10; ++i){
-		if(!active[i].size())continue;
-		lowestPrior = i;
-		break;
-	}
-	hebraT aux = active[lowestPrior].front();
-	active[lowestPrior].pop();
+	int firstPrior = getFirstPriority();
+	hebraT aux = active[firstPrior].front();
+	active[firstPrior].pop();
 	sizeActive--;
 	return aux; 
 }
@@ -52,3 +48,13 @@ void runQueues::swapQ(){
 int runQueues::rqSize(){return (sizeActive+sizeExpired);}
 
 int runQueues::getActiveSize(){return sizeActive;}
+
+int runQueues:: getFirstPriority(){
+	int firstPrior;
+	for (int i = 0; i < 10; ++i){
+		if(!active[i].size())continue;
+		firstPrior = i;
+		break;
+	}
+	return firstPrior;
+}

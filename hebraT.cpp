@@ -4,9 +4,12 @@
 #include <algorithm>
 
 
+
 hebraT::hebraT(int id, int a,int b){
 	this->id = id;
-	tiempo = a+rand()%(b-a+1);
+	tiempo = tiempoOriginal = a+rand()%(b-a+1);
+
+	start = chrono::system_clock::now();
 }
 
 void hebraT::procesar(int x){
@@ -17,3 +20,11 @@ void hebraT::procesar(int x){
 int hebraT::tiempoRestante(){return tiempo;}
 
 int hebraT::getId(){return id;}
+
+int hebraT::getTiempoOriginal(){return tiempoOriginal;}
+
+double hebraT::turnAroundTime(){
+	auto end = chrono::system_clock::now();
+	chrono::duration<double> elapsed_seconds = end-start;
+	return elapsed_seconds.count();
+}

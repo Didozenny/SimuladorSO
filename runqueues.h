@@ -15,6 +15,7 @@ public:
 	void insertE(hebraT T, int priority);
 	void insertA(hebraT T, int priority);
 	hebraT pop(mutex &p);
+	int getFirstPriority();
 	int rqSize();
 	int getActiveSize();
 };
