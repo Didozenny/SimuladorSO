@@ -112,9 +112,8 @@ int main(int argc, char *argv[]){
 	int maxProcesses = atoi(argv[5]);
 	int periodo = atoi(argv[6]);
 	bool fullPrint = false;
-	string action(argv[7]);
-	if(action == "fullPrint")
-		fullPrint = true;
+	if(argc == 8 and string(argv[7]) == "fullPrint")
+		fullPrint = true;		
 
 	srand(time(NULL));
 	//creamos arreglo de hebras M 
